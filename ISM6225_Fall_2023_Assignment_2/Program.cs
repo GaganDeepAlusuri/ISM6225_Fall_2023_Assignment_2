@@ -83,44 +83,64 @@ namespace ISM6225_Fall_2023_Assignment_2
         }
 
         /*
-        
-        Question 1:
-        You are given an inclusive range [lower, upper] and a sorted unique integer array nums, where all elements are within the inclusive range. A number x is considered missing if x is in the range [lower, upper] and x is not in nums. Return the shortest sorted list of ranges that exactly covers all the missing numbers. That is, no element of nums is included in any of the ranges, and each missing number is covered by one of the ranges.
-        Example 1:
-        Input: nums = [0,1,3,50,75], lower = 0, upper = 99
-        Output: [[2,2],[4,49],[51,74],[76,99]]  
-        Explanation: The ranges are:
-        [2,2]
-        [4,49]
-        [51,74]
-        [76,99]
-        Example 2:
-        Input: nums = [-1], lower = -1, upper = -1
-        Output: []
-        Explanation: There are no missing ranges since there are no missing numbers.
+         Question 1:
+         You are given an inclusive range [lower, upper] and a sorted unique integer array nums, where all elements are within the inclusive range. A number x is considered missing if x is in the range [lower, upper] and x is not in nums. Return the shortest sorted list of ranges that exactly covers all the missing numbers. That is, no element of nums is included in any of the ranges, and each missing number is covered by one of the ranges.
+         Example 1:
+         Input: nums = [0,1,3,50,75], lower = 0, upper = 99
+         Output: [[2,2],[4,49],[51,74],[76,99]]  
+         Explanation: The ranges are:
+         [2,2]
+         [4,49]
+         [51,74]
+         [76,99]
+         Example 2:
+         Input: nums = [-1], lower = -1, upper = -1
+         Output: []
+         Explanation: There are no missing ranges since there are no missing numbers.
 
-        Constraints:
-        -109 <= lower <= upper <= 109
-        0 <= nums.length <= 100
-        lower <= nums[i] <= upper
-        All the values of nums are unique.
+         Constraints:
+         -109 <= lower <= upper <= 109
+         0 <= nums.length <= 100
+         lower <= nums[i] <= upper
+         All the values of nums are unique.
 
-        Time complexity: O(n), space complexity:O(1)
-        */
+         Time complexity: O(n), space complexity:O(1)
+         */
 
         public static IList<IList<int>> FindMissingRanges(int[] nums, int lower, int upper)
         {
+            IList<IList<int>> result = new List<IList<int>>();
+
             try
             {
-                // Write your code here and you can modify the return value according to the requirements
-                return new List<IList<int>>();
+                long start = lower; // Use long to avoid integer overflow
+                long end = upper;
+
+                for (int i = 0; i < nums.Length; i++)
+                {
+                    if (nums[i] > start)
+                    {
+                        // Adjusted this line to include the same start and end if the range consists of a single element
+                        result.Add(new List<int> { (int)start, nums[i] - 1 == start ? (int)start : nums[i] - 1 });
+                    }
+
+                    start = (long)nums[i] + 1; // Move the start to the next number
+                }
+
+                if (start <= end)
+                {
+                    // Adjusted this line to include the same start and end if the range consists of a single element
+                    result.Add(new List<int> { (int)start, start == end ? (int)end : (int)end });
+                }
             }
             catch (Exception)
             {
                 throw;
             }
 
+            return result;
         }
+
 
         /*
          
@@ -151,19 +171,51 @@ namespace ISM6225_Fall_2023_Assignment_2
 
         Time complexity:O(n^2), space complexity:O(1)
         */
-
         public static bool IsValid(string s)
         {
             try
             {
-                // Write your code here and you can modify the return value according to the requirements
-                return s.Length == 0;
+                Stack<char> stack = new Stack<char>();
+
+                foreach (char c in s)
+                {
+                    if (c == '(' || c == '{' || c == '[')
+                    {
+                        stack.Push(c);
+                    }
+                    else
+                    {
+                        if (stack.Count == 0)
+                        {
+                            return false;
+                        }
+
+                        char top = stack.Pop();
+
+                        if (c == ')' && top != '(')
+                        {
+                            return false;
+                        }
+                        else if (c == '}' && top != '{')
+                        {
+                            return false;
+                        }
+                        else if (c == ']' && top != '[')
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                return stack.Count == 0;
             }
             catch (Exception)
             {
                 throw;
             }
         }
+
+
 
         /*
 
@@ -191,14 +243,31 @@ namespace ISM6225_Fall_2023_Assignment_2
         {
             try
             {
-                // Write your code here and you can modify the return value according to the requirements
-                return 1;
+                int minPrice = int.MaxValue;
+                int maxProfit = 0;
+
+                for (int i = 0; i < prices.Length; i++)
+                {
+                    // Update the minimum price if the current price is lower
+                    if (prices[i] < minPrice)
+                    {
+                        minPrice = prices[i];
+                    }
+                    // Calculate the potential profit if we sell at the current price
+                    else if (prices[i] - minPrice > maxProfit)
+                    {
+                        maxProfit = prices[i] - minPrice;
+                    }
+                }
+
+                return maxProfit;
             }
             catch (Exception)
             {
                 throw;
             }
         }
+
 
         /*
         
@@ -224,19 +293,41 @@ namespace ISM6225_Fall_2023_Assignment_2
 
         Time complexity:O(n), space complexity:O(1)
         */
-
         public static bool IsStrobogrammatic(string s)
         {
             try
             {
-                // Write your code here and you can modify the return value according to the requirements
-                return false;
+                int left = 0;
+                int right = s.Length - 1;
+
+                while (left <= right)
+                {
+                    char leftChar = s[left];
+                    char rightChar = s[right];
+
+                    if ((leftChar == '0' && rightChar == '0') ||
+                        (leftChar == '1' && rightChar == '1') ||
+                        (leftChar == '8' && rightChar == '8') ||
+                        (leftChar == '6' && rightChar == '9') ||
+                        (leftChar == '9' && rightChar == '6'))
+                    {
+                        left++;
+                        right--;
+                    }
+                    else
+                    {
+                        return false; // If any pair of characters is not strobogrammatic, return false
+                    }
+                }
+
+                return true; // If the entire string is strobogrammatic, return true
             }
             catch (Exception)
             {
                 throw;
             }
         }
+
 
         /*
 
@@ -271,8 +362,23 @@ namespace ISM6225_Fall_2023_Assignment_2
         {
             try
             {
-                // Write your code here and you can modify the return value according to the requirements
-                return 0;
+                Dictionary<int, int> countMap = new Dictionary<int, int>();
+                int goodPairsCount = 0;
+
+                foreach (int num in nums)
+                {
+                    if (countMap.ContainsKey(num))
+                    {
+                        goodPairsCount += countMap[num];
+                        countMap[num]++;
+                    }
+                    else
+                    {
+                        countMap[num] = 1;
+                    }
+                }
+
+                return goodPairsCount;
             }
             catch (Exception)
             {
@@ -281,54 +387,59 @@ namespace ISM6225_Fall_2023_Assignment_2
         }
 
         /*
-        Question 6
+            Question 6
 
-        Given an integer array nums, return the third distinct maximum number in this array. If the third maximum does not exist, return the maximum number.
+            Given an integer array nums, return the third distinct maximum number in this array. If the third maximum does not exist, return the maximum number.
 
-        Example 1:
+            Example 1:
 
-        Input: nums = [3,2,1]
-        Output: 1
-        Explanation:
-        The first distinct maximum is 3.
-        The second distinct maximum is 2.
-        The third distinct maximum is 1.
-        Example 2:
+            Input: nums = [3,2,1]
+            Output: 1
+            Explanation:
+            The first distinct maximum is 3.
+            The second distinct maximum is 2.
+            The third distinct maximum is 1.
+            Example 2:
 
-        Input: nums = [1,2]
-        Output: 2
-        Explanation:
-        The first distinct maximum is 2.
-        The second distinct maximum is 1.
-        The third distinct maximum does not exist, so the maximum (2) is returned instead.
-        Example 3:
+            Input: nums = [1,2]
+            Output: 2
+            Explanation:
+            The first distinct maximum is 2.
+            The second distinct maximum is 1.
+            The third distinct maximum does not exist, so the maximum (2) is returned instead.
+            Example 3:
 
-        Input: nums = [2,2,3,1]
-        Output: 1
-        Explanation:
-        The first distinct maximum is 3.
-        The second distinct maximum is 2 (both 2's are counted together since they have the same value).
-        The third distinct maximum is 1.
-        Constraints:
+            Input: nums = [2,2,3,1]
+            Output: 1
+            Explanation:
+            The first distinct maximum is 3.
+            The second distinct maximum is 2 (both 2's are counted together since they have the same value).
+            The third distinct maximum is 1.
+            Constraints:
 
-        1 <= nums.length <= 104
-        -231 <= nums[i] <= 231 - 1
+            1 <= nums.length <= 104
+            -231 <= nums[i] <= 231 - 1
 
-        Time complexity:O(nlogn), space complexity:O(n)
-        */
+            Time complexity:O(nlogn), space complexity:O(n)
+            */
 
         public static int ThirdMax(int[] nums)
         {
             try
             {
-                // Write your code here and you can modify the return value according to the requirements
-                return 0;
+                // Using Linq to get distinct elements and sort them in descending order
+                var distinctNums = nums.Distinct().OrderByDescending(x => x).ToArray();
+
+                // Return the third maximum if it exists, otherwise return the maximum
+                return distinctNums.Length >= 3 ? distinctNums[2] : distinctNums[0];
             }
             catch (Exception)
             {
                 throw;
             }
         }
+
+
 
         /*
         
@@ -354,8 +465,22 @@ namespace ISM6225_Fall_2023_Assignment_2
         {
             try
             {
-                // Write your code here and you can modify the return value according to the requirements
-                return new List<string>() { };
+                IList<string> result = new List<string>();
+                char[] currentStateArray = currentState.ToCharArray();
+
+                for (int i = 0; i < currentStateArray.Length - 1; i++)
+                {
+                    if (currentStateArray[i] == '+' && currentStateArray[i + 1] == '+')
+                    {
+                        currentStateArray[i] = '-';
+                        currentStateArray[i + 1] = '-';
+                        result.Add(new string(currentStateArray));
+                        currentStateArray[i] = '+'; // Reset back to the original state for the next iteration
+                        currentStateArray[i + 1] = '+';
+                    }
+                }
+
+                return result;
             }
             catch (Exception)
             {
@@ -383,8 +508,18 @@ namespace ISM6225_Fall_2023_Assignment_2
 
         public static string RemoveVowels(string s)
         {
-            // Write your code here and you can modify the return value according to the requirements
-            return "";
+            StringBuilder result = new StringBuilder();
+
+            foreach (char c in s)
+            {
+                if (c != 'a' && c != 'e' && c != 'i' && c != 'o' && c != 'u' &&
+                    c != 'A' && c != 'E' && c != 'I' && c != 'O' && c != 'U')
+                {
+                    result.Append(c);
+                }
+            }
+
+            return result.ToString();
         }
 
         /* Inbuilt Functions - Don't Change the below functions */
